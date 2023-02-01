@@ -8,8 +8,10 @@ const {
   handleValidateOwnership,
 } = require("../middleware/auth");
 
-router.post("/", async (req, res, next) => {
+router.post("/", requireToken, async (req, res, next) => {
   try {
+    const owner = req.associate._id;
+    req.body.associate = owner;
     const salt = await bcrypt.genSalt(10);
 
     const passwordHash = await bcrypt.hash(req.body.password, salt);
@@ -37,20 +39,22 @@ router.post("/", async (req, res, next) => {
     res.status(400).json({ message: error });
   }
 });
+
 router.post("/login", async (req, res, next) => {
   try {
-    const loggingassociate = req.body.email;
-    const foundassociate = await User.findOne({ email: loggingassociate });
-    const token = await createAssociatteToken(req, foundUser);
+    const loggingAssociate = req.body.email;
+    const foundAssociate = await Associate.findOne({ email: loggingAssociate });
+    const token = await createAssociateToken(req, foundAssociate);
     res.status(200).json({
-      associate: foundassociate,
+      associate: foundAssociate,
       isLoggedIn: true,
-      token: auth,
+      token,
     });
   } catch (err) {
     res.status(401).json({ error: err.message });
   }
 });
+
 router.get("/", async (req, res, next) => {
   try {
     const associates = await Associate.find({});

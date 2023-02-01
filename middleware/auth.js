@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Strategy, ExtractJwt } = require("passport-jwt");
 const Associate = require("../models/associate");
-
+const mongoose = require("mongoose");
 const secret = process.env.JWT_SECRET || "🤐 🤫 🙈";
 
 const opts = {
@@ -12,14 +12,27 @@ const opts = {
 };
 const verify = async (jwt_payload, done) => {
   try {
-    const associate = await Associate.findById(jwt_payload);
+    const associate = await Associate.findById(
+      mongoose.Types.ObjectId(jwt_payload.id)
+    );
     return done(null, associate);
   } catch (err) {
     return done(err);
   }
 };
 
-const strategy = new Strategy(opts, verify);
+const strategy = new Strategy(opts, function verify(jwt_payload, done) {
+  Associate.findOne({ _id: jwt_payload.id }, (err, associate) => {
+    if (err) {
+      return done(err, false);
+    }
+    if (associate) {
+      return done(null, associate);
+    } else {
+      return done(null, false);
+    }
+  });
+});
 passport.use(strategy);
 passport.initialize();
 const requireToken = passport.authenticate("jwt", { session: false });
@@ -35,6 +48,7 @@ const createAssociateToken = (req, associate) => {
   }
   return jwt.sign({ id: associate._id }, secret, { expiresIn: 36000 });
 };
+
 const handleValidateOwnership = (req, document) => {
   const ownerId = document.owner._id || document.owner;
 
