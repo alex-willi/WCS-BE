@@ -7,6 +7,11 @@ const associateSchema = new mongoose.Schema(
     password: { type: String },
     role: { type: String },
     projects: { type: mongoose.Schema.Types.ObjectId, ref: "Project" },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   {
     timestamps: true,

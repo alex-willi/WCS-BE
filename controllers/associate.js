@@ -1,60 +1,20 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcrypt");
 const Associate = require("../models/associate");
-const {
-  createAssociateToken,
-  requireToken,
-  handleValidateOwnership,
-} = require("../middleware/auth");
-
+const { handleValidateOwnership, requireToken } = require("../middleware/auth");
 router.post("/", requireToken, async (req, res, next) => {
   try {
-    const owner = req.associate._id;
-    req.body.associate = owner;
-    const salt = await bcrypt.genSalt(10);
-
-    const passwordHash = await bcrypt.hash(req.body.password, salt);
-
-    const pwStore = req.body.password;
-
-    req.body.password = passwordHash;
-
+    // passport will verify the the token passed with the request's Authorization headers and set the current user for the request.
+    const owner = req.user._id;
+    req.body.owner = owner;
     const newAssociate = await Associate.create(req.body);
-    if (newAssociate) {
-      req.body.password = pwStore;
-      const authenticatedAssociateToken = createAssociateToken(
-        req,
-        newAssociate
-      );
-      res.status(201).json({
-        associate: newAssociate,
-        isLoggedIn: true,
-        token: authenticatedAssociateToken,
-      });
-    } else {
-      res.status(400).json({ error: "Something went wrong" });
-    }
-  } catch (error) {
-    res.status(400).json({ message: error });
-  }
-});
-
-router.post("/login", async (req, res, next) => {
-  try {
-    const loggingAssociate = req.body.email;
-    const foundAssociate = await Associate.findOne({ email: loggingAssociate });
-    const token = await createAssociateToken(req, foundAssociate);
-    res.status(200).json({
-      associate: foundAssociate,
-      isLoggedIn: true,
-      token,
+    res.status(201).json({
+      associate: newAssociate,
     });
-  } catch (err) {
-    res.status(401).json({ error: err.message });
+  } catch (error) {
+    res.status(400).json({ message: "Error creating associate", error });
   }
 });
-
 router.get("/", async (req, res, next) => {
   try {
     const associates = await Associate.find({});
@@ -65,29 +25,33 @@ router.get("/", async (req, res, next) => {
 });
 router.get("/:id", async (req, res, next) => {
   try {
-    const associate = await Associate.findById(req.params.id);
+    const associate = await Associate.findById(req.params.id)
+      .populate("owner")
+      .exec();
     // const projects = await Project.find({ associate: req.params.id });
-
     res.status(200).json(associate);
   } catch (err) {
     res.status(400).json({ error: err });
     next(err);
   }
 });
-router.put("/:id", async (req, res) => {
+router.put("/:id", requireToken, async (req, res) => {
   try {
-    const associate = await Associate.findByIdAndUpdate(
+    handleValidateOwnership(req, await Associate.findById(req.params.id));
+    const updatedassociate = await Associate.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
     );
-    res.status(201).json(associate);
-  } catch (err) {
-    res.status(400).json({ error: err });
+    res.status(200).json(updatedassociate);
+  } catch (error) {
+    //send error
+    res.status(400).json({ error: error.message });
   }
 });
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireToken, async (req, res) => {
   try {
+    handleValidateOwnership(req, await Associate.findById(req.params.id));
     const associate = await Associate.findByIdAndDelete(req.params.id);
     res.status(201).json(associate);
   } catch (err) {
