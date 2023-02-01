@@ -40,4 +40,24 @@ router.get("/:id", async (req, res, next) => {
     next(err);
   }
 });
+router.put("/:id", async (req, res) => {
+  try {
+    const associate = await Associate.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.status(201).json(associate);
+  } catch (err) {
+    res.status(400).json({ error: err });
+  }
+});
+router.delete("/:id", async (req, res) => {
+  try {
+    const associate = await Associate.findByIdAndDelete(req.params.id);
+    res.status(201).json(associate);
+  } catch (err) {
+    res.status(400).json({ error: err });
+  }
+});
 module.exports = router;
