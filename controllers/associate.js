@@ -21,4 +21,23 @@ router.post("/", async (req, res, next) => {
     res.status(400).json({ message: "Error creating associate", error });
   }
 });
+router.get("/", async (req, res, next) => {
+  try {
+    const associates = await Associate.find({});
+    res.status(200).json(associates);
+  } catch {
+    res.status(400).json(console.error);
+  }
+});
+router.get("/:id", async (req, res, next) => {
+  try {
+    const associate = await Associate.findById(req.params.id);
+    // const projects = await Project.find({ associate: req.params.id });
+
+    res.status(200).json(associate);
+  } catch (err) {
+    res.status(400).json({ error: err });
+    next(err);
+  }
+});
 module.exports = router;

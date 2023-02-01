@@ -1,13 +1,25 @@
 const mongoose = require("mongoose");
 
-const associateSchema = new mongoose.Schema({
-  name: { type: String },
-  email: { type: String },
-  password: { type: String },
-  role: { type: String },
-  projects: { type: mongoose.Schema.Types.ObjectId, ref: "Project" },
-});
+const associateSchema = new mongoose.Schema(
+  {
+    name: { type: String },
+    email: { type: String },
+    password: { type: String },
+    role: { type: String },
+    projects: { type: mongoose.Schema.Types.ObjectId, ref: "Project" },
+  },
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_doc, ret) => {
+        delete ret.password;
+        return ret;
+      },
+    },
+  }
+);
 
-Associate = mongoose.model("associate", associateSchema);
+const Associate = mongoose.model("associate", associateSchema);
 
 module.exports = Associate;
