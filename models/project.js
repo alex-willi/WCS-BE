@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+
 const ProjectSchema = new Schema(
   {
     name: {
@@ -12,6 +13,13 @@ const ProjectSchema = new Schema(
     },
     client: {
       type: String,
+      required: true,
+    },
+
+    associates: String,
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
   },
