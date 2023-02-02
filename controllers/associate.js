@@ -29,7 +29,6 @@ router.get("/", requireToken, async (req, res, next) => {
     const associate = await Associate.findOne({ owner: req.user._id })
       .populate("owner")
       .exec();
-    // console.log(req.user._id);
     if (!associate) {
       return res.status(404).json({ error: "Associate not found" });
     }
