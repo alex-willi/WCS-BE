@@ -16,7 +16,7 @@ app.use("/associate", associateController);
 app.use("/auth", authController);
 
 app.get("/", (req, res) => {
-  //   res.redirect("/");
+  res.redirect("/associate");
 });
 
 app.listen(process.env.PORT || 4000);
