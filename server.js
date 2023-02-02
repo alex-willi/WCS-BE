@@ -19,4 +19,4 @@ app.get("/", (req, res) => {
   //   res.redirect("/");
 });
 
-app.listen(PORT, () => console.log(`Listening to port: ${PORT}`));
+app.listen(process.env.PORT || 4000);
