@@ -11,7 +11,7 @@ router.post("/", requireToken, async (req, res, next) => {
 
     const limit = 1;
     if (associateCount >= limit) {
-      return res.status(400).json({
+      return res.status(201).json({
         message: `You already have the maximum number of associates (${limit})`,
       });
     }
