@@ -32,17 +32,21 @@ router.get("/", async (req, res, next) => {
     res.status(400).json(console.error);
   }
 });
-router.get("/:id", async (req, res, next) => {
+router.get("/", requireToken, async (req, res, next) => {
   try {
-    const associate = await Associate.findById(req.params.id)
+    const associate = await Associate.findOne({ owner: req.user._id })
       .populate("owner")
       .exec();
+    if (!associate) {
+      return res.status(404).json({ error: "Associate not found" });
+    }
     res.status(200).json(associate);
   } catch (err) {
     res.status(400).json({ error: err });
     next(err);
   }
 });
+
 router.put("/:id", requireToken, async (req, res) => {
   try {
     handleValidateOwnership(req, await Associate.findById(req.params.id));
