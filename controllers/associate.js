@@ -2,28 +2,17 @@ const express = require("express");
 const router = express.Router();
 const Associate = require("../models/associate");
 const { handleValidateOwnership, requireToken } = require("../middleware/auth");
-router.post("/", requireToken, async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
-    const owner = req.user._id;
-    req.body.owner = owner;
-
-    const associateCount = await Associate.count({ owner });
-
-    const limit = 1;
-    if (associateCount >= limit) {
-      return res.status(403).json({
-        message: `You already have the maximum number of associates (${limit})`,
-      });
-    }
-
     const newAssociate = await Associate.create(req.body);
     res.status(201).json({
       associate: newAssociate,
     });
   } catch (error) {
-    res.status(400).json({ error: err });
+    res.status(400).json({ error: error.message });
   }
 });
+
 router.get("/", requireToken, async (req, res, next) => {
   try {
     const associate = await Associate.findOne({ owner: req.user._id })

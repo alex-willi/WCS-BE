@@ -6,11 +6,11 @@ const associateSchema = new mongoose.Schema(
     email: { type: String },
     role: { type: String },
     projects: { type: mongoose.Schema.Types.ObjectId, ref: "Project" },
-    owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+    // owner: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "User",
+    //   required: true,
+    // },
   },
   {
     timestamps: true,
