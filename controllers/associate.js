@@ -24,19 +24,12 @@ router.post("/", requireToken, async (req, res, next) => {
     res.status(400).json({ message: "Error creating associate", error });
   }
 });
-router.get("/", async (req, res, next) => {
-  try {
-    const associates = await Associate.find({});
-    res.status(200).json(associates);
-  } catch {
-    res.status(400).json(console.error);
-  }
-});
 router.get("/", requireToken, async (req, res, next) => {
   try {
     const associate = await Associate.findOne({ owner: req.user._id })
       .populate("owner")
       .exec();
+    // console.log(req.user._id);
     if (!associate) {
       return res.status(404).json({ error: "Associate not found" });
     }
