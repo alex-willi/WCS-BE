@@ -4,9 +4,18 @@ const Associate = require("../models/associate");
 const { handleValidateOwnership, requireToken } = require("../middleware/auth");
 router.post("/", requireToken, async (req, res, next) => {
   try {
-    // passport will verify the the token passed with the request's Authorization headers and set the current user for the request.
     const owner = req.user._id;
     req.body.owner = owner;
+
+    const associateCount = await Associate.count({ owner });
+
+    const limit = 1;
+    if (associateCount >= limit) {
+      return res.status(400).json({
+        message: `You already have the maximum number of associates (${limit})`,
+      });
+    }
+
     const newAssociate = await Associate.create(req.body);
     res.status(201).json({
       associate: newAssociate,
@@ -28,7 +37,6 @@ router.get("/:id", async (req, res, next) => {
     const associate = await Associate.findById(req.params.id)
       .populate("owner")
       .exec();
-    // const projects = await Project.find({ associate: req.params.id });
     res.status(200).json(associate);
   } catch (err) {
     res.status(400).json({ error: err });
