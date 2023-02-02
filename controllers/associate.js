@@ -40,9 +40,8 @@ router.get("/", requireToken, async (req, res, next) => {
   }
 });
 
-router.put("/:id", requireToken, async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
-    handleValidateOwnership(req, await Associate.findById(req.params.id));
     const updatedassociate = await Associate.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -54,9 +53,8 @@ router.put("/:id", requireToken, async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
-router.delete("/:id", requireToken, async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
-    handleValidateOwnership(req, await Associate.findById(req.params.id));
     const associate = await Associate.findByIdAndDelete(req.params.id);
     res.status(201).json(associate);
   } catch (err) {

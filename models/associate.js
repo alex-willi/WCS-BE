@@ -4,7 +4,6 @@ const associateSchema = new mongoose.Schema(
   {
     name: { type: String },
     email: { type: String },
-    password: { type: String },
     role: { type: String },
     projects: { type: mongoose.Schema.Types.ObjectId, ref: "Project" },
     owner: {
