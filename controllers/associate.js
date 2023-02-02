@@ -11,7 +11,7 @@ router.post("/", requireToken, async (req, res, next) => {
 
     const limit = 1;
     if (associateCount >= limit) {
-      return res.status(201).json({
+      return res.status(403).json({
         message: `You already have the maximum number of associates (${limit})`,
       });
     }
@@ -21,7 +21,7 @@ router.post("/", requireToken, async (req, res, next) => {
       associate: newAssociate,
     });
   } catch (error) {
-    res.status(400).json({ message: "Error creating associate", error });
+    res.status(400).json({ error: err });
   }
 });
 router.get("/", requireToken, async (req, res, next) => {
@@ -58,13 +58,13 @@ router.put("/:id", async (req, res) => {
     res.status(200).json(updatedassociate);
   } catch (error) {
     //send error
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: err });
   }
 });
 router.delete("/:id", async (req, res) => {
   try {
     const associate = await Associate.findByIdAndDelete(req.params.id);
-    res.status(201).json(associate);
+    res.status(204).json(associate);
   } catch (err) {
     res.status(400).json({ error: err });
   }
