@@ -32,7 +32,9 @@ router.get("/", requireToken, async (req, res, next) => {
     const associate = await Associate.findOne({ owner: req.user._id });
 
     if (!associate) {
-      return res.status(404).json({ message: "MAKE A PROFILE" });
+      return res
+        .status(404)
+        .json({ error: "Associate not found", owner: req.user._id });
     }
     res.status(200).json({ associate: associate, owner: owner });
   } catch (err) {
