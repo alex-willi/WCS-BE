@@ -3,11 +3,11 @@ const router = express.Router();
 const Project = require("../models/project");
 const { handleValidateOwnership, requireToken } = require("../middleware/auth");
 
-router.get("/users", async (req, res) => {
+router.get("/owner", requireToken, async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
-    if (!project) return res.status(404).send("Project not found");
-    res.send(project);
+    const projects = await Project.find({ owner: req.user._id });
+    if (!projects) return res.status(404).send("No projects found");
+    res.send(projects);
   } catch (error) {
     res.status(500).send(error.message);
   }
