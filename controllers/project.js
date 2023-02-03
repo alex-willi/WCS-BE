@@ -47,5 +47,13 @@ router.put("/:id", requireToken, async (req, res) => {
     res.status(500).send(error.message);
   }
 });
-
+router.delete("/:id", requireToken, async (req, res) => {
+  try {
+    const project = await Project.findByIdAndDelete(req.params.id);
+    if (!project) return res.status(404).send("Project not found");
+    res.send(project);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 module.exports = router;

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Associate = require("../models/associate");
-const { handleValidateOwnership, requireToken } = require("../middleware/auth");
+const { requireToken } = require("../middleware/auth");
 router.post("/", requireToken, async (req, res, next) => {
   try {
     const owner = req.user._id;
