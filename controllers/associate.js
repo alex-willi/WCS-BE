@@ -27,7 +27,7 @@ router.post("/", requireToken, async (req, res, next) => {
 });
 router.get("/", requireToken, async (req, res, next) => {
   try {
-    const owner = await User.find({});
+    const owner = await User.findOne({ _id: req.user._id });
     console.log(owner);
     const associate = await Associate.findOne({ owner: req.user._id });
 
