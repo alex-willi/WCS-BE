@@ -36,7 +36,7 @@ router.post("/", requireToken, async (req, res, next) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", requireToken, async (req, res) => {
   try {
     const project = await Project.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
