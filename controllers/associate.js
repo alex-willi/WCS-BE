@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Associate = require("../models/associate");
 const { requireToken } = require("../middleware/auth");
+const User = require("../models/User");
 router.post("/", requireToken, async (req, res, next) => {
   try {
     const owner = req.user._id;
@@ -26,19 +27,22 @@ router.post("/", requireToken, async (req, res, next) => {
 });
 router.get("/", requireToken, async (req, res, next) => {
   try {
-    const associate = await Associate.findOne({ owner: req.user._id })
-      .populate("owner")
-      .exec();
+    const owner = await User.find({});
+    console.log(owner);
+    const associate = await Associate.findOne({ owner: req.user._id });
+
     if (!associate) {
-      return res.status(404).json({ error: "Associate not found" });
+      return res
+        .status(404)
+        .json({ error: "Associate not found", owner: req.user._id });
     }
-    res.status(200).json(associate);
+    res.status(200).json({ associate: associate, owner: owner });
   } catch (err) {
     res.status(400).json({ error: err });
     next(err);
   }
 });
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", requireToken, async (req, res, next) => {
   try {
     const foundAssociate = await Associate.findById(req.params.id);
 
@@ -48,7 +52,7 @@ router.get("/:id", async (req, res, next) => {
     next(err);
   }
 });
-router.put("/:id", async (req, res) => {
+router.put("/:id", requireToken, async (req, res) => {
   try {
     const updatedassociate = await Associate.findByIdAndUpdate(
       req.params.id,
@@ -61,7 +65,7 @@ router.put("/:id", async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireToken, async (req, res) => {
   try {
     const associate = await Associate.findByIdAndDelete(req.params.id);
     res.status(201).json(associate);
